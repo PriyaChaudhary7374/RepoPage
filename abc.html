@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Repositories</title>
+    <link rel='preconnect' href='https://fonts.googleapis.com'>
+<link href='https://fonts.googleapis.com/css2?family=Poppins&display=swap' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://kit.fontawesome.com/a1cd4d0c99.js" crossorigin="anonymous"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        #container {
+            max-width: 970px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #user-info {
+            text-align: left;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ccc;
+        }
+        #user-info img {
+            border-radius: 70%;
+            width: 180px;
+            height: 180px;
+            margin-right: 70px;
+        }
+        #repositories {
+            margin-top: 20px;
+        }
+        .repo {
+            max-width:400px;
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            background-color: #fff;
+            transition: box-shadow 0.3s ease;
+            margin-right:40px;
+            margin-left:40px;
+           
+        }
+        .content{
+            margin-top:30px;
+        }
+        .repo:hover {
+            box-shadow: 0 0 15px rgba(0, 123, 255, 0.3);
+        }
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .loader {
+            display: block;
+            margin: 20px auto;
+        }
+        #olderNewerButtons {
+            display: flex;
+            justify-content: space-evenly;
+            margin-top: 10px;
+            
+        }
+        #olderButton  {
+            cursor: pointer;
+            color: grey;
+            border: 2px solid rgb(174, 173, 173);
+            padding: 8px 12px;
+            border-radius: 30px;
+        }
+        #newerButton{
+            cursor: pointer;
+            color: rgb(78, 172, 209);
+            border: 2px solid rgb(174, 173, 173);
+            padding: 8px 12px;
+            border-radius: 30px;
+        }
+        .repo-numbers {
+            display: flex;
+            justify-content: center;
+            border: 1px solid rgb(181, 176, 176);
+    
+
+        }
+
+        .heading{
+            color:rgb(78, 172, 209)
+        }
+        .repo-number {
+            cursor: pointer;
+            padding: 5px 10px;
+            background-color: white;
+            color:#3b94f4 ;
+            text-decoration: none; 
+            border-color: white;
+            border: 1px solid rgb(181, 176, 176);
+        }
+        .active-repo-number {
+          background-color: #3b94f4;
+        color: white;
+        }
+        .topics{
+    color:white;
+    border:2px solid black;
+    background-color:#3b94f4 ;
+}
+    
+
+
+        #prevSetButton, #nextSetButton {
+            cursor: pointer;
+            background-color: #3b94f4;
+            color: #fff;
+            border: 1 px solid white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin: 0 5px;
+        }
+        .btn-topic{
+            margin:4px;
+            color:white;
+            background-color:#3b94f4;
+            pointer-events: none; 
+            cursor: default;
+        }
+        #github-link{
+            text-decoration:none;
+            color:black;
+
+        }
+        
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <div id="user-info">
+        <div class="d-flex align-items-center">
+            <img id="avatar" src="https://cdn3.iconfinder.com/data/icons/avatar-165/536/NORMAL_HAIR-512.png" alt="User Avatar">
+            <div class="content">
+                <h2 id="username"></h2>
+                <p id="bio">Bio goes here</p>
+                <p id="location"><i class="fa-solid fa-location-dot"></i> Orlando</p>
+                <p id="twitter">Twitter:<a class="github-link" href="https://twitter.com/john_doe" target="_blank"> https://twitter.com/john_doe</a></p>
+            </div>
+        </div>
+        <div > 
+            <p id="github-link"><a id="github-link" href="https://github.com/john_doe" target="_blank"><i class="fa-solid fa-link"></i> https://github.com/john_doe</a></p>
+        </div>
+    </div>
+
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" id="searchInput" placeholder="Search repositories">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" onclick="searchRepositories()">Search</button>
+        </div>
+    </div>
+
+    <div class="row" id="repositories"></div>
+
+    <div class="pagination justify-content-center">
+        <div class="repo-numbers active-repo-number justify-content-center align-items-center" id="repoNumbers"></div>
+        
+       
+    </div>
+    <div id="olderNewerButtons">
+        <button id="olderButton" class="btn" onclick="loadRepositories('prev')"><b>&#8592;Older</b></button>
+        <button id="newerButton" class="btn" onclick="loadRepositories('next')"><b>Newer&#8594;</b></button>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    const username = 'johnpapa'; // Replace with the desired GitHub username
+    let page = 1;
+    let perPage = 10;
+    let totalRepos = 0;
+
+    function fetchUserData() {
+        fetch(`https://api.github.com/users/${username}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('avatar').src = data.avatar_url;
+                document.getElementById('username').innerText = data.login;
+                document.getElementById('bio').innerText = data.bio || 'Bio goes here';
+                document.getElementById('location').innerHTML = data.location?`<i class="fa-solid fa-location-dot"></i> ${data.location}`:'';
+                document.getElementById('twitter').innerHTML = data.twitter_username
+                    ? `Twitter: <a  href="https://twitter.com/${data.twitter_username}" target="_blank">${data.twitter_username}</a>`
+                    : '';
+                    
+                    document.getElementById('github-link').innerHTML=data.html_url
+                    ?`<a id="github-link" href="https://github.com/${data.html_url}" target="_blank"><i class="fa-solid fa-link"></i> ${data.html_url}</a>`:'';
+            })
+            .catch(error => console.error('Error fetching user data:', error));
+    }
+
+    function fetchRepositories() {
+    const loader = $('<div class="loader">Loading...</div>');
+    $('#repositories').html(loader);
+
+    const apiUrl = `https://api.github.com/users/${username}/repos?page=${page}&per_page=${perPage}`;
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(repositories => {
+            totalRepos = repositories.length;
+
+            const repositoriesContainer = $('#repositories');
+            repositoriesContainer.html('');
+
+            repositories.forEach(repo => {
+                const repoElement = $('<div class="col-md-6 repo">' +
+                    `<h3 class="heading">${repo.name}</h3>` +
+                    `<p><b>${repo.description || 'No description available'}</b></p>` +
+                    `<div class="repo-topics"></div>` +
+                    '</div>');
+
+                const repoTopicsContainer = repoElement.find('.repo-topics');
+                repo.topics.forEach(topic => {
+                    const topicButton = $(`<button class="btn btn-outline-secondary btn-sm btn-topic">${topic}</button>`);
+                    repoTopicsContainer.append(topicButton);
+                });
+
+                repositoriesContainer.append(repoElement);
+            });
+        })
+        .catch(error => console.error('Error fetching repositories:', error))
+        .finally(() => loader.remove());
+}
+
+    function loadRepositories(direction) {
+        if ((direction === 'prev' && page > 1) || (direction === 'next' && totalRepos === perPage)) {
+            page += (direction === 'prev' ? -1 : 1);
+            fetchRepositories();
+            updatePagination();
+        } else if (direction === 'prevSet') {
+            page -= 10;
+            fetchRepositories();
+            updatePagination();
+        } else if (direction === 'nextSet') {
+            page += 10;
+            fetchRepositories();
+            updatePagination();
+        }
+    }
+
+    function searchRepositories() {
+    const searchTerm = $('#searchInput').val().toLowerCase();
+    if (searchTerm.trim() !== '') {
+      
+        page = 1;
+
+        const apiUrl = `https://api.github.com/users/${username}/repos?per_page=${perPage}?q=${searchTerm}`;
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(repositories => {
+                totalRepos = repositories.length;
+
+                const repositoriesContainer = $('#repositories');
+                repositoriesContainer.html('');
+
+                repositories.forEach(repo => {
+                    const repoElement = $('<div class="col-md-6 repo">' +
+                        `<h3 class="heading">${repo.name}</h3>` +
+                    `<p><b>${repo.description || 'No description available'}</b></p>` +
+                    `<div class="repo-topics"></div>` +
+                    '</div>');
+
+                    const repoTopicsContainer = repoElement.find('.repo-topics');
+                    repo.topics.forEach(topic => {
+                        const topicButton = $(`<button class="btn btn-outline-secondary btn-sm btn-topic">${topic}</button>`);
+                        repoTopicsContainer.append(topicButton);
+                    });
+
+                    repositoriesContainer.append(repoElement);
+                });
+
+                updatePagination();
+            })
+            .catch(error => console.error('Error fetching repositories:', error)).finally(() => $('#searchInput').val('')); 
+    } else {
+        $('#searchInput').val('');
+        fetchRepositories();
+        updatePagination();
+    }
+}
+
+
+
+
+    function updatePagination() {
+    const repoNumbersContainer = $('#repoNumbers');
+    repoNumbersContainer.html('');
+
+    const firstRepoNumber = $('<button class="repo-number">&lt;&lt;</button>');
+    firstRepoNumber.click(() => loadRepositories('prevSet'));
+    repoNumbersContainer.append(firstRepoNumber);
+
+    for (let i = page - 1; i <= page + 8; i++) {
+        if (i > 0) {
+            const repoNumber = $(`<button class="repo-number">${i}</button>`);
+            repoNumber.click(() => goToPage(i));
+            if (i === page) {
+                repoNumber.addClass('active-repo-number');
+            }
+            repoNumbersContainer.append(repoNumber);
+        }
+    }
+
+    const lastRepoNumber = $('<button class="repo-number">&gt;&gt;</button>');
+    lastRepoNumber.click(() => loadRepositories('nextSet'));
+    repoNumbersContainer.append(lastRepoNumber);
+}
+
+    function goToPage(selectedPage) {
+        page = selectedPage;
+        fetchRepositories();
+        updatePagination();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchUserData();
+        fetchRepositories();
+        updatePagination();
+    });
+</script>
+
+</body>
+</html>
+
+
+
