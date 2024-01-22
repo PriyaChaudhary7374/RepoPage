@@ -255,47 +255,52 @@
         }
     }
 
-    function searchRepositories() {
+   function searchRepositories() {
     const searchTerm = $('#searchInput').val().toLowerCase();
+    
     if (searchTerm.trim() !== '') {
-      
         page = 1;
 
-        const apiUrl = `https://api.github.com/users/${username}/repos?per_page=${perPage}?q=${searchTerm}`;
+        const apiUrl = `https://api.github.com/search/repositories?q=${searchTerm}&per_page=${perPage}`;
+        
         fetch(apiUrl)
             .then(response => response.json())
-            .then(repositories => {
-                totalRepos = repositories.length;
+            .then(data => {
+                totalRepos = data.total_count;
 
                 const repositoriesContainer = $('#repositories');
                 repositoriesContainer.html('');
 
-                repositories.forEach(repo => {
+                data.items.forEach(repo => {
                     const repoElement = $('<div class="col-md-6 repo">' +
                         `<h3 class="heading">${repo.name}</h3>` +
-                    `<p><b>${repo.description || 'No description available'}</b></p>` +
-                    `<div class="repo-topics"></div>` +
-                    '</div>');
+                        `<p><b>${repo.description || 'No description available'}</b></p>` +
+                        `<div class="repo-topics"></div>` +
+                        '</div>');
 
                     const repoTopicsContainer = repoElement.find('.repo-topics');
-                    repo.topics.forEach(topic => {
-                        const topicButton = $(`<button class="btn btn-outline-secondary btn-sm btn-topic">${topic}</button>`);
-                        repoTopicsContainer.append(topicButton);
-                    });
+                    
+                    
+                    if (repo.topics) {
+                        repo.topics.forEach(topic => {
+                            const topicButton = $(`<button class="btn btn-outline-secondary btn-sm btn-topic">${topic}</button>`);
+                            repoTopicsContainer.append(topicButton);
+                        });
+                    }
 
                     repositoriesContainer.append(repoElement);
                 });
 
                 updatePagination();
             })
-            .catch(error => console.error('Error fetching repositories:', error)).finally(() => $('#searchInput').val('')); 
+            .catch(error => console.error('Error fetching repositories:', error))
+            .finally(() => $('#searchInput').val(''));
     } else {
         $('#searchInput').val('');
         fetchRepositories();
         updatePagination();
     }
 }
-
 
 
 
